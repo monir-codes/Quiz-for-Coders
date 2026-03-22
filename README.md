@@ -1,9 +1,9 @@
 # 💻 Quiz for Coders
 > **An AI-powered, multi-language interview preparation platform built with TypeScript for modern Web Developers.**
 
-[![Live Demo](https://img.shields.io/badge/Live-Demo-0078d7?style=for-the-badge)](YOUR_VERCEL_LIVE_LINK)
-[![Hosted on Vercel](https://img.shields.io/badge/Vercel-Hosted-black?style=for-the-badge&logo=vercel)](YOUR_VERCEL_LIVE_LINK)
-[![AI Integration](https://img.shields.io/badge/Powered-By%20AI-blueviolet?style=for-the-badge)](YOUR_VERCEL_LIVE_LINK)
+[![Live Demo](https://img.shields.io/badge/Live-Demo-0078d7?style=for-the-badge)](https://quiz-for-coders.vercel.app/)
+[![Hosted on Vercel](https://img.shields.io/badge/Vercel-Hosted-black?style=for-the-badge&logo=vercel)](https://quiz-for-coders.vercel.app/)
+[![AI Integration](https://img.shields.io/badge/Powered-By%20AI-blueviolet?style=for-the-badge)](https://quiz-for-coders.vercel.app/)
 
 ---
 
