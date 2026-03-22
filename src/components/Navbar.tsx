@@ -51,13 +51,13 @@ export default function Navbar({ theme, setTheme, lang, setLang, onAboutClick, o
               >
                 <div className="absolute inset-0 bg-emerald-500/20 blur-lg rounded-full group-hover:bg-emerald-500/30 transition-colors"></div>
                 <img 
-                  src="https://postimg.cc/4Hg3KX3Y" 
+                  src="./src/icon.png" 
                   alt="Icon" 
                   className="w-8 h-8 sm:w-10 sm:h-10 relative z-10 object-contain drop-shadow-xl"
                   referrerPolicy="no-referrer"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
-                    target.src = "https://picsum.photos/seed/quiz/128/128";
+                    target.src = "./src/icon.png";
                   }}
                 />
               </motion.div>
