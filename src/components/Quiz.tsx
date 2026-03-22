@@ -196,14 +196,40 @@ export default function Quiz({ category, difficulty, lang, onComplete, onExit }:
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-[calc(100vh-64px)] flex flex-col items-center justify-center p-4">
-        <Loader2 className="animate-spin text-emerald-500 mb-4" size={48} />
-        <p className="text-xl font-bold text-zinc-900 dark:text-white">{resumed ? t.resuming : t.loading}</p>
+ if (loading) {
+   return (
+     <div className="min-h-screen flex flex-col items-center justify-center bg-zinc-50 dark:bg-zinc-950">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="relative"
+        >
+          <div className="w-20 h-20 border-4 border-emerald-500/20 rounded-full"></div>
+          <motion.div 
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            className="absolute inset-0 w-20 h-20 border-4 border-emerald-500 border-t-transparent rounded-full"
+          />
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: [0.4, 1, 0.4] }}
+            transition={{ duration: 2, repeat: Infinity }}
+            className="absolute inset-0 flex items-center justify-center"
+          >
+            <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+          </motion.div>
+        </motion.div>
+        <motion.p 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="mt-6 text-sm font-black uppercase tracking-[0.3em] text-emerald-500 animate-pulse"
+        >
+          Initializing Quiz...
+        </motion.p>
       </div>
-    );
-  }
+   );
+ }
 
   if (error) {
     return (
