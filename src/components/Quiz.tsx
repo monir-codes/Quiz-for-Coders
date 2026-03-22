@@ -119,7 +119,10 @@ export default function Quiz({ category, difficulty, lang, onComplete, onExit }:
       }, 1000);
     } else if (timeLeft === 0 && timerActive) {
       setTimerActive(false);
-      setShowExplanation(true);
+      // Small delay to show the "Time Out" message before switching to explanation
+      setTimeout(() => {
+        setShowExplanation(true);
+      }, 1500);
       // If time runs out, it's considered incorrect (selectedOption remains null)
     }
     return () => clearInterval(interval);
@@ -162,7 +165,7 @@ export default function Quiz({ category, difficulty, lang, onComplete, onExit }:
       if (auth.currentUser) {
         const result: QuizResult = {
           userId: auth.currentUser.uid,
-          score: score + (selectedOption === questions[currentIndex].correct ? 1 : 0),
+          score: score,
           totalQuestions: questions.length,
           timestamp: new Date().toISOString(),
           category,
@@ -188,6 +191,22 @@ export default function Quiz({ category, difficulty, lang, onComplete, onExit }:
       <div className="min-h-[calc(100vh-64px)] flex flex-col items-center justify-center p-4">
         <Loader2 className="animate-spin text-emerald-500 mb-4" size={48} />
         <p className="text-xl font-bold text-zinc-900 dark:text-white">{resumed ? t.resuming : t.loading}</p>
+      </div>
+    );
+  }
+
+  if (questions.length === 0) {
+    return (
+      <div className="min-h-[calc(100vh-64px)] flex flex-col items-center justify-center p-4 text-center">
+        <XCircle className="text-red-500 mb-4" size={48} />
+        <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-2">Failed to load questions</h2>
+        <p className="text-zinc-500 mb-8">Please check your internet connection or API key and try again.</p>
+        <button
+          onClick={onExit}
+          className="px-8 py-3 bg-emerald-500 text-white font-bold rounded-2xl hover:bg-emerald-600 transition-all"
+        >
+          {t.home}
+        </button>
       </div>
     );
   }
@@ -362,16 +381,23 @@ export default function Quiz({ category, difficulty, lang, onComplete, onExit }:
                     <h4 className="text-xs font-black uppercase tracking-[0.2em] text-zinc-400">{t.explanation}</h4>
                   </div>
                   
-                  {selectedOption !== currentQuestion.correct && (
+                  {selectedOption !== null && selectedOption !== currentQuestion.correct && (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="p-4 bg-red-500/5 rounded-2xl border border-red-500/10">
                         <p className="text-[10px] uppercase font-black tracking-widest text-red-500 mb-1">{t.yourAnswer}</p>
-                        <p className="text-sm font-bold text-red-600 dark:text-red-400">{currentQuestion.options[selectedOption!]}</p>
+                        <p className="text-sm font-bold text-red-600 dark:text-red-400">{currentQuestion.options[selectedOption]}</p>
                       </div>
                       <div className="p-4 bg-emerald-500/5 rounded-2xl border border-emerald-500/10">
                         <p className="text-[10px] uppercase font-black tracking-widest text-emerald-500 mb-1">{t.correctAnswer}</p>
                         <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400">{currentQuestion.options[currentQuestion.correct]}</p>
                       </div>
+                    </div>
+                  )}
+                  
+                  {selectedOption === null && (
+                    <div className="p-4 bg-red-500/5 rounded-2xl border border-red-500/10 mb-4">
+                      <p className="text-[10px] uppercase font-black tracking-widest text-red-500 mb-1">{t.correctAnswer}</p>
+                      <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400">{currentQuestion.options[currentQuestion.correct]}</p>
                     </div>
                   )}
                 </div>

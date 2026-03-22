@@ -21,8 +21,17 @@ app.use(express.json());
 const MONGODB_URI = process.env.MONGODB_URI || "mongodb+srv://quiz_db:knSflNWG0W9HaXmf@simple-crud-cluster.0hdbxiy.mongodb.net/?appName=Simple-crud-cluster";
 
 mongoose.connect(MONGODB_URI)
-  .then(() => console.log("Connected to MongoDB"))
-  .catch(err => console.error("MongoDB connection error:", err));
+  .then(() => console.log("✅ Connected to MongoDB"))
+  .catch(err => console.error("❌ MongoDB connection error:", err));
+
+// Health Check
+app.get("/api/health", (req, res) => {
+  res.json({ 
+    status: "ok", 
+    mongodb: mongoose.connection.readyState === 1 ? "connected" : "disconnected",
+    timestamp: new Date().toISOString()
+  });
+});
 
 // Mongoose Schemas
 const userSchema = new mongoose.Schema({

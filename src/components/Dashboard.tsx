@@ -167,7 +167,7 @@ export default function Dashboard({ lang, onStartQuiz }: DashboardProps) {
   };
 
   const hasProgress = (catId: string) => {
-    const storageKey = `quiz_progress_${auth.currentUser?.uid}_${catId}_${lang}`;
+    const storageKey = `quiz_progress_${auth.currentUser?.uid}_${catId}_${selectedDifficulty}_${lang}`;
     return localStorage.getItem(storageKey) !== null;
   };
 

@@ -1,9 +1,13 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { QuizQuestion, Language, Difficulty } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-
 export async function generateQuizQuestions(category: string, language: Language, difficulty: Difficulty): Promise<QuizQuestion[]> {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    throw new Error('GEMINI_API_KEY is not set in the environment variables.');
+  }
+  const ai = new GoogleGenAI({ apiKey });
+  
   const difficultyContext = {
     Easy: "Focus on fundamental concepts, basic syntax, and common definitions. Suitable for beginners or junior developers.",
     Medium: "Focus on practical application, intermediate patterns, and common problem-solving scenarios. Suitable for mid-level developers.",
