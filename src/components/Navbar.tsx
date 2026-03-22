@@ -51,13 +51,13 @@ export default function Navbar({ theme, setTheme, lang, setLang, onAboutClick, o
               >
                 <div className="absolute inset-0 bg-emerald-500/20 blur-lg rounded-full group-hover:bg-emerald-500/30 transition-colors"></div>
                 <img 
-                  src="./src/icon.png" 
+                  src="https://iili.io/qSG2DvV.png" 
                   alt="Icon" 
                   className="w-8 h-8 sm:w-10 sm:h-10 relative z-10 object-contain drop-shadow-xl"
                   referrerPolicy="no-referrer"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
-                    target.src = "./src/icon.png";
+                    target.src = "https://iili.io/qSG2DvV.png";
                   }}
                 />
               </motion.div>
