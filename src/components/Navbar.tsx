@@ -53,7 +53,7 @@ export default function Navbar({ theme, setTheme, lang, setLang, onAboutClick, o
                 <img 
                   src="https://iili.io/qSG2DvV.png" 
                   alt="Icon" 
-                  className="w-8 h-8 sm:w-10 sm:h-10 relative z-10 object-contain drop-shadow-xl"
+                  className="w-12 h-12 sm:w-10 sm:h-10 relative z-10 object-cover drop-shadow-xl"
                   referrerPolicy="no-referrer"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
