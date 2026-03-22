@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Moon, Sun, Languages, MoreVertical, Info, LogOut, User, Home, Menu } from 'lucide-react';
+import { Moon, Sun, Languages, MoreVertical, Info, LogOut, User, Home, Menu, Trophy } from 'lucide-react';
 import { auth } from '../firebase';
 import { signOut } from 'firebase/auth';
 import { Language, Theme } from '../types';
@@ -13,17 +13,18 @@ interface NavbarProps {
   setLang: (l: Language) => void;
   onAboutClick: () => void;
   onHomeClick: () => void;
+  onLeaderboardClick: () => void;
   onMenuClick: () => void;
 }
 
-export default function Navbar({ theme, setTheme, lang, setLang, onAboutClick, onHomeClick, onMenuClick }: NavbarProps) {
+export default function Navbar({ theme, setTheme, lang, setLang, onAboutClick, onHomeClick, onLeaderboardClick, onMenuClick }: NavbarProps) {
   const [showMenu, setShowMenu] = useState(false);
 
   const handleLogout = () => signOut(auth);
 
   const translations = {
-    EN: { about: 'About', logout: 'Logout', profile: 'Profile', home: 'Home' },
-    BN: { about: 'সম্পর্কে', logout: 'লগআউট', profile: 'প্রোফাইল', home: 'হোম' }
+    EN: { about: 'About', logout: 'Logout', profile: 'Profile', home: 'Home', leaderboard: 'Leaderboard' },
+    BN: { about: 'সম্পর্কে', logout: 'লগআউট', profile: 'প্রোফাইল', home: 'হোম', leaderboard: 'লিডারবোর্ড' }
   };
 
   const t = translations[lang];
@@ -77,6 +78,14 @@ export default function Navbar({ theme, setTheme, lang, setLang, onAboutClick, o
             >
               <Home size={18} />
               <span>{t.home}</span>
+            </button>
+
+            <button
+              onClick={onLeaderboardClick}
+              className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all"
+            >
+              <Trophy size={18} />
+              <span>{t.leaderboard}</span>
             </button>
 
             <button

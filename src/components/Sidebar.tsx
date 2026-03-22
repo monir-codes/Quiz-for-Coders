@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Github, Linkedin, Info, User, Mail, ExternalLink, Smartphone, Download } from 'lucide-react';
+import { X, Github, Linkedin, Info, User, Mail, ExternalLink, Smartphone, Download, Home, Trophy } from 'lucide-react';
 import { Language } from '../types';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -8,11 +8,15 @@ interface SidebarProps {
   onClose: () => void;
   lang: Language;
   onAboutClick: () => void;
+  onLeaderboardClick: () => void;
+  onHomeClick: () => void;
 }
 
-export default function Sidebar({ isOpen, onClose, lang, onAboutClick }: SidebarProps) {
+export default function Sidebar({ isOpen, onClose, lang, onAboutClick, onLeaderboardClick, onHomeClick }: SidebarProps) {
   const translations = {
     EN: {
+      home: 'Home',
+      leaderboard: 'Leaderboard',
       about: 'About App',
       developer: 'Developer Info',
       contact: 'Contact',
@@ -25,6 +29,8 @@ export default function Sidebar({ isOpen, onClose, lang, onAboutClick }: Sidebar
       installDesc: 'Get the best experience on your mobile device.'
     },
     BN: {
+      home: 'হোম',
+      leaderboard: 'লিডারবোর্ড',
       about: 'অ্যাপ সম্পর্কে',
       developer: 'ডেভেলপার তথ্য',
       contact: 'যোগাযোগ',
@@ -88,6 +94,26 @@ export default function Sidebar({ isOpen, onClose, lang, onAboutClick }: Sidebar
             </div>
 
             <div className="flex-1 overflow-y-auto p-6 space-y-8">
+              {/* Navigation Section */}
+              <section>
+                <div className="flex flex-col gap-2">
+                  <button
+                    onClick={onHomeClick}
+                    className="flex items-center gap-4 px-4 py-3 rounded-2xl text-sm font-bold text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all"
+                  >
+                    <Home size={20} />
+                    <span>{t.home}</span>
+                  </button>
+                  <button
+                    onClick={onLeaderboardClick}
+                    className="flex items-center gap-4 px-4 py-3 rounded-2xl text-sm font-bold text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all"
+                  >
+                    <Trophy size={20} />
+                    <span>{t.leaderboard}</span>
+                  </button>
+                </div>
+              </section>
+
               {/* Install App Section */}
               <section className="bg-emerald-500/10 dark:bg-emerald-500/5 p-4 rounded-2xl border border-emerald-500/20">
                 <div className="flex items-center gap-3 mb-2 text-emerald-500">

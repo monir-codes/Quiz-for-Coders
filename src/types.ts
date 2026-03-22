@@ -1,3 +1,5 @@
+export type Difficulty = 'Easy' | 'Medium' | 'Hard';
+
 export interface UserProfile {
   uid: string;
   name: string;
@@ -15,6 +17,7 @@ export interface QuizResult {
   timestamp: string;
   category: string;
   language: 'EN' | 'BN';
+  difficulty: Difficulty;
 }
 
 export interface QuizQuestion {
@@ -23,6 +26,7 @@ export interface QuizQuestion {
   correct: number;
   explanation: string;
   category: string;
+  difficulty: Difficulty;
 }
 
 export type Language = 'EN' | 'BN';

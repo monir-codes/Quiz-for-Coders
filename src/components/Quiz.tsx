@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { generateQuizQuestions } from '../services/geminiService';
-import { QuizQuestion, Language, QuizResult } from '../types';
+import { QuizQuestion, Language, QuizResult, Difficulty } from '../types';
 import { db, auth, handleFirestoreError, OperationType } from '../firebase';
 import { collection, addDoc } from 'firebase/firestore';
 import { CheckCircle2, XCircle, ArrowRight, Loader2, Trophy, RefreshCw, Home, ArrowLeft } from 'lucide-react';
@@ -10,12 +10,13 @@ import CountUp from 'react-countup';
 
 interface QuizProps {
   category: string;
+  difficulty: Difficulty;
   lang: Language;
   onComplete: () => void;
   onExit: () => void;
 }
 
-export default function Quiz({ category, lang, onComplete, onExit }: QuizProps) {
+export default function Quiz({ category, difficulty, lang, onComplete, onExit }: QuizProps) {
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [score, setScore] = useState(0);
@@ -23,15 +24,21 @@ export default function Quiz({ category, lang, onComplete, onExit }: QuizProps) 
   const [showExplanation, setShowExplanation] = useState(false);
   const [loading, setLoading] = useState(true);
   const [finished, setFinished] = useState(false);
+  const [resumed, setResumed] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(30);
+  const [timerActive, setTimerActive] = useState(false);
 
   const translations = {
     EN: {
       loading: 'Generating AI Questions...',
+      resuming: 'Resuming your progress...',
       next: 'Next Question',
       finish: 'Finish Quiz',
       correct: 'Correct!',
       incorrect: 'Incorrect',
       explanation: 'Explanation',
+      correctAnswer: 'Correct Answer',
+      yourAnswer: 'Your Answer',
       result: 'Quiz Result',
       score: 'Your Score',
       perfect: 'Perfect Score!',
@@ -39,15 +46,19 @@ export default function Quiz({ category, lang, onComplete, onExit }: QuizProps) 
       keepGoing: 'Keep Practicing!',
       home: 'Go Home',
       retry: 'Try Again',
-      back: 'Back'
+      back: 'Back',
+      timeOut: "Time's Up!"
     },
     BN: {
       loading: 'AI প্রশ্ন তৈরি হচ্ছে...',
+      resuming: 'আপনার অগ্রগতি পুনরুদ্ধার করা হচ্ছে...',
       next: 'পরবর্তী প্রশ্ন',
       finish: 'কুইজ শেষ করুন',
       correct: 'সঠিক!',
       incorrect: 'ভুল',
       explanation: 'ব্যাখ্যা',
+      correctAnswer: 'সঠিক উত্তর',
+      yourAnswer: 'আপনার উত্তর',
       result: 'কুইজ ফলাফল',
       score: 'আপনার স্কোর',
       perfect: 'পারফেক্ট স্কোর!',
@@ -55,16 +66,33 @@ export default function Quiz({ category, lang, onComplete, onExit }: QuizProps) 
       keepGoing: 'অনুশীলন চালিয়ে যান!',
       home: 'হোমে ফিরে যান',
       retry: 'আবার চেষ্টা করুন',
-      back: 'পিছনে'
+      back: 'পিছনে',
+      timeOut: 'সময় শেষ!'
     }
   };
 
   const t = translations[lang];
 
+  const storageKey = `quiz_progress_${auth.currentUser?.uid}_${category}_${difficulty}_${lang}`;
+
   useEffect(() => {
     const loadQuestions = async () => {
       try {
-        const data = await generateQuizQuestions(category, lang);
+        const savedProgress = localStorage.getItem(storageKey);
+        if (savedProgress) {
+          const parsed = JSON.parse(savedProgress);
+          setQuestions(parsed.questions);
+          setCurrentIndex(parsed.currentIndex);
+          setScore(parsed.score);
+          setSelectedOption(parsed.selectedOption);
+          setShowExplanation(parsed.showExplanation);
+          setTimeLeft(parsed.timeLeft !== undefined ? parsed.timeLeft : 30);
+          setResumed(true);
+          setLoading(false);
+          return;
+        }
+
+        const data = await generateQuizQuestions(category, lang, difficulty);
         setQuestions(data);
       } catch (err) {
         console.error('Error loading questions:', err);
@@ -73,10 +101,48 @@ export default function Quiz({ category, lang, onComplete, onExit }: QuizProps) 
       }
     };
     loadQuestions();
-  }, [category, lang]);
+  }, [category, lang, difficulty, storageKey]);
+
+  useEffect(() => {
+    if (questions.length > 0 && !finished && !showExplanation) {
+      setTimerActive(true);
+    } else {
+      setTimerActive(false);
+    }
+  }, [questions, finished, showExplanation]);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (timerActive && timeLeft > 0) {
+      interval = setInterval(() => {
+        setTimeLeft((prev) => prev - 1);
+      }, 1000);
+    } else if (timeLeft === 0 && timerActive) {
+      setTimerActive(false);
+      setShowExplanation(true);
+      // If time runs out, it's considered incorrect (selectedOption remains null)
+    }
+    return () => clearInterval(interval);
+  }, [timerActive, timeLeft]);
+
+  useEffect(() => {
+    if (questions.length > 0 && !finished) {
+      const progress = {
+        questions,
+        currentIndex,
+        score,
+        selectedOption,
+        showExplanation,
+        timeLeft,
+        timestamp: new Date().toISOString()
+      };
+      localStorage.setItem(storageKey, JSON.stringify(progress));
+    }
+  }, [questions, currentIndex, score, selectedOption, showExplanation, finished, storageKey, timeLeft]);
 
   const handleOptionSelect = (index: number) => {
     if (showExplanation) return;
+    setTimerActive(false);
     setSelectedOption(index);
     setShowExplanation(true);
     if (index === questions[currentIndex].correct) {
@@ -89,8 +155,10 @@ export default function Quiz({ category, lang, onComplete, onExit }: QuizProps) 
       setCurrentIndex(prev => prev + 1);
       setSelectedOption(null);
       setShowExplanation(false);
+      setTimeLeft(30);
     } else {
       setFinished(true);
+      localStorage.removeItem(storageKey);
       if (auth.currentUser) {
         const result: QuizResult = {
           userId: auth.currentUser.uid,
@@ -98,7 +166,8 @@ export default function Quiz({ category, lang, onComplete, onExit }: QuizProps) 
           totalQuestions: questions.length,
           timestamp: new Date().toISOString(),
           category,
-          language: lang
+          language: lang,
+          difficulty
         };
         
         try {
@@ -118,7 +187,7 @@ export default function Quiz({ category, lang, onComplete, onExit }: QuizProps) 
     return (
       <div className="min-h-[calc(100vh-64px)] flex flex-col items-center justify-center p-4">
         <Loader2 className="animate-spin text-emerald-500 mb-4" size={48} />
-        <p className="text-xl font-bold text-zinc-900 dark:text-white">{t.loading}</p>
+        <p className="text-xl font-bold text-zinc-900 dark:text-white">{resumed ? t.resuming : t.loading}</p>
       </div>
     );
   }
@@ -183,7 +252,10 @@ export default function Quiz({ category, lang, onComplete, onExit }: QuizProps) 
             {t.back}
           </button>
           <div className="text-right">
-            <span className="text-sm font-black text-emerald-500 uppercase tracking-[0.2em] block mb-1">{category}</span>
+            <div className="flex items-center gap-2 justify-end mb-1">
+              <span className="text-[10px] font-black px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-500 uppercase tracking-widest">{difficulty}</span>
+              <span className="text-sm font-black text-emerald-500 uppercase tracking-[0.2em]">{category}</span>
+            </div>
             <div className="flex items-center gap-2 justify-end">
               <span className="text-xs font-bold text-zinc-400">{currentIndex + 1} / {questions.length}</span>
               <div className="w-24 h-1.5 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
@@ -202,12 +274,30 @@ export default function Quiz({ category, lang, onComplete, onExit }: QuizProps) 
         layout
         className="bg-white dark:bg-zinc-900 rounded-[48px] p-8 sm:p-14 shadow-2xl border border-zinc-200 dark:border-zinc-800 relative overflow-hidden"
       >
+        {/* Timer Progress Bar */}
+        <div className="absolute top-0 left-0 w-full h-1 bg-zinc-100 dark:bg-zinc-800">
+          <motion.div 
+            initial={{ width: '100%' }}
+            animate={{ width: `${(timeLeft / 30) * 100}%` }}
+            transition={{ duration: 1, ease: 'linear' }}
+            className={`h-full ${timeLeft <= 5 ? 'bg-red-500' : 'bg-emerald-500'}`}
+          />
+        </div>
+
         {/* Subtle background pattern for the quiz box */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 blur-[80px] rounded-full -mr-32 -mt-32 pointer-events-none"></div>
         
         <h2 className="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-white mb-10 leading-tight relative z-10">
           {currentQuestion.question}
         </h2>
+
+        {timeLeft === 0 && !showExplanation && (
+          <div className="absolute top-4 right-14 z-20">
+            <span className="px-3 py-1 bg-red-500 text-white text-[10px] font-black uppercase tracking-widest rounded-full animate-pulse">
+              {t.timeOut}
+            </span>
+          </div>
+        )}
 
         <div className="space-y-4 mb-10 relative z-10">
           {currentQuestion.options.map((option, idx) => {
@@ -266,10 +356,26 @@ export default function Quiz({ category, lang, onComplete, onExit }: QuizProps) 
               className="overflow-hidden"
             >
               <div className="mb-8 p-8 bg-zinc-50 dark:bg-zinc-800/50 rounded-[32px] border border-zinc-100 dark:border-zinc-700">
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="w-1.5 h-4 bg-emerald-500 rounded-full"></div>
-                  <h4 className="text-xs font-black uppercase tracking-[0.2em] text-zinc-400">{t.explanation}</h4>
+                <div className="flex flex-col gap-4 mb-6">
+                  <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-4 bg-emerald-500 rounded-full"></div>
+                    <h4 className="text-xs font-black uppercase tracking-[0.2em] text-zinc-400">{t.explanation}</h4>
+                  </div>
+                  
+                  {selectedOption !== currentQuestion.correct && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="p-4 bg-red-500/5 rounded-2xl border border-red-500/10">
+                        <p className="text-[10px] uppercase font-black tracking-widest text-red-500 mb-1">{t.yourAnswer}</p>
+                        <p className="text-sm font-bold text-red-600 dark:text-red-400">{currentQuestion.options[selectedOption!]}</p>
+                      </div>
+                      <div className="p-4 bg-emerald-500/5 rounded-2xl border border-emerald-500/10">
+                        <p className="text-[10px] uppercase font-black tracking-widest text-emerald-500 mb-1">{t.correctAnswer}</p>
+                        <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400">{currentQuestion.options[currentQuestion.correct]}</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
+                
                 <div className="text-zinc-700 dark:text-zinc-300 text-sm leading-relaxed prose dark:prose-invert max-w-none">
                   <ReactMarkdown>{currentQuestion.explanation}</ReactMarkdown>
                 </div>

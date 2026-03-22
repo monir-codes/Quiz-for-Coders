@@ -40,7 +40,8 @@ const resultSchema = new mongoose.Schema({
   totalQuestions: { type: Number, required: true },
   timestamp: { type: String, default: () => new Date().toISOString() },
   category: String,
-  language: String
+  language: String,
+  difficulty: String
 });
 
 const User = mongoose.model("User", userSchema);
@@ -89,6 +90,45 @@ app.get("/api/results/:userId", async (req, res) => {
     res.json(results);
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch results" });
+  }
+});
+
+app.get("/api/leaderboard", async (req, res) => {
+  try {
+    const leaderboard = await QuizResult.aggregate([
+      {
+        $group: {
+          _id: "$userId",
+          totalScore: { $sum: "$score" },
+          quizzesTaken: { $sum: 1 },
+          avgPercentage: { $avg: { $divide: ["$score", "$totalQuestions"] } }
+        }
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "_id",
+          foreignField: "uid",
+          as: "user"
+        }
+      },
+      { $unwind: "$user" },
+      {
+        $project: {
+          uid: "$_id",
+          name: "$user.name",
+          profilePic: "$user.profilePic",
+          totalScore: 1,
+          quizzesTaken: 1,
+          avgPercentage: { $multiply: ["$avgPercentage", 100] }
+        }
+      },
+      { $sort: { totalScore: -1 } },
+      { $limit: 10 }
+    ]);
+    res.json(leaderboard);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch leaderboard" });
   }
 });
 

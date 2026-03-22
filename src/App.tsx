@@ -7,7 +7,8 @@ import Auth from './components/Auth';
 import Dashboard from './components/Dashboard';
 import Quiz from './components/Quiz';
 import About from './components/About';
-import { Language, Theme } from './types';
+import Leaderboard from './components/Leaderboard';
+import { Language, Theme, Difficulty } from './types';
 import { motion, AnimatePresence } from 'motion/react';
 
 export default function App() {
@@ -18,6 +19,8 @@ export default function App() {
   const [isAboutOpen, setIsAboutOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [activeQuiz, setActiveQuiz] = useState<string | null>(null);
+  const [activeDifficulty, setActiveDifficulty] = useState<Difficulty>('Medium');
+  const [view, setView] = useState<'dashboard' | 'leaderboard'>('dashboard');
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (u) => {
@@ -51,7 +54,8 @@ export default function App() {
         lang={lang} 
         setLang={setLang} 
         onAboutClick={() => setIsAboutOpen(true)} 
-        onHomeClick={() => setActiveQuiz(null)}
+        onHomeClick={() => { setActiveQuiz(null); setView('dashboard'); }}
+        onLeaderboardClick={() => { setActiveQuiz(null); setView('leaderboard'); }}
         onMenuClick={() => setIsSidebarOpen(true)}
       />
 
@@ -60,6 +64,8 @@ export default function App() {
         onClose={() => setIsSidebarOpen(false)} 
         lang={lang} 
         onAboutClick={() => setIsAboutOpen(true)}
+        onLeaderboardClick={() => { setView('leaderboard'); setIsSidebarOpen(false); setActiveQuiz(null); }}
+        onHomeClick={() => { setView('dashboard'); setIsSidebarOpen(false); setActiveQuiz(null); }}
       />
 
       <main className="relative">
@@ -84,9 +90,23 @@ export default function App() {
             >
               <Quiz 
                 category={activeQuiz} 
+                difficulty={activeDifficulty}
                 lang={lang} 
                 onComplete={() => setActiveQuiz(null)}
                 onExit={() => setActiveQuiz(null)}
+              />
+            </motion.div>
+          ) : view === 'leaderboard' ? (
+            <motion.div
+              key="leaderboard"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.4 }}
+            >
+              <Leaderboard 
+                lang={lang} 
+                onBack={() => setView('dashboard')} 
               />
             </motion.div>
           ) : (
@@ -99,7 +119,10 @@ export default function App() {
             >
               <Dashboard 
                 lang={lang} 
-                onStartQuiz={(cat) => setActiveQuiz(cat)} 
+                onStartQuiz={(cat, diff) => {
+                  setActiveQuiz(cat);
+                  setActiveDifficulty(diff);
+                }} 
               />
             </motion.div>
           )}
