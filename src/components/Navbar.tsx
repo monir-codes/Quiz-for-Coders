@@ -53,7 +53,7 @@ export default function Navbar({ theme, setTheme, lang, setLang, onAboutClick, o
                 <img 
                   src="https://iili.io/qSG2DvV.png" 
                   alt="Icon" 
-                  className="w-12 h-12 sm:w-10 sm:h-10 relative z-10 object-cover drop-shadow-xl"
+                  className="w-14 h-14 sm:w-10 sm:h-10 relative z-10 object-cover drop-shadow-xl"
                   referrerPolicy="no-referrer"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
@@ -66,8 +66,8 @@ export default function Navbar({ theme, setTheme, lang, setLang, onAboutClick, o
                 animate={{ opacity: 1, x: 0 }}
                 className="flex flex-col -space-y-1 sm:-space-y-2"
               >
-                <span className="text-2xl sm:text-4xl font-display text-zinc-800 dark:text-white tracking-[0.2em] sm:tracking-[0.5em] ml-0.5 mb-1 uppercase leading-none font-bold">QUIZ</span>
-                <span className="text-[8px] sm:text-[10px] font-display font-black text-emerald-500 uppercase tracking-[0.3em] sm:tracking-[0.5em] ml-0.5 opacity-90">FOR CODERS</span>
+                <span className="text-2xl sm:text-4xl font-display text-zinc-800 dark:text-white tracking-[0.2em] sm:tracking-[0.5em] ml-0.2 mb-1 uppercase leading-none font-bold">QUIZ</span>
+                <span className="text-[8px] sm:text-[10px] font-display font-black text-emerald-500 uppercase tracking-[0.3em] sm:tracking-[0.5em] ml-0.2 opacity-90">FOR CODERS</span>
               </motion.div>
             </button>
           </div>
