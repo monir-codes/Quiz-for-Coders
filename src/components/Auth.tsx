@@ -133,8 +133,8 @@ export default function Auth({ lang }: AuthProps) {
   return (
     <div className="min-h-[calc(100vh-64px)] flex items-center justify-center p-4 bg-zinc-50 dark:bg-zinc-950">
       <div className="w-full max-w-md bg-white dark:bg-zinc-900 rounded-[32px] shadow-2xl border border-zinc-200 dark:border-zinc-800 p-8">
-        <div className="text-center mb-8">
-          <div className="flex flex-col items-center gap-4 mb-4">
+        <div className="text-center mb-4">
+          <div className="flex flex-col items-center gap-4 mb-8">
             <motion.div 
               whileHover={{ scale: 1.1, rotate: 5 }}
               whileTap={{ scale: 0.95 }}
