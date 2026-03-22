@@ -65,10 +65,10 @@ export default function About({ isOpen, onClose, lang }: AboutProps) {
           <div className="mt-8 pt-6 border-t border-zinc-100 dark:border-zinc-800">
             <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-4">{t.socials}</h3>
             <div className="flex gap-4">
-              <a href="#" target="_blank" rel="noopener noreferrer" className="p-3 bg-zinc-100 dark:bg-zinc-800 rounded-2xl hover:bg-emerald-500 hover:text-white transition-all">
+              <a href="https://github.com/monir-codes" target="_blank" rel="noopener noreferrer" className="p-3 bg-zinc-100 dark:bg-zinc-800 rounded-2xl hover:bg-emerald-500 hover:text-white transition-all">
                 <Github size={20} />
               </a>
-              <a href="#" target="_blank" rel="noopener noreferrer" className="p-3 bg-zinc-100 dark:bg-zinc-800 rounded-2xl hover:bg-emerald-500 hover:text-white transition-all">
+              <a href="https://www.linkedin.com/in/moniruzzaman-rumman" target="_blank" rel="noopener noreferrer" className="p-3 bg-zinc-100 dark:bg-zinc-800 rounded-2xl hover:bg-emerald-500 hover:text-white transition-all">
                 <Linkedin size={20} />
               </a>
             </div>

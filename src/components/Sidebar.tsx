@@ -164,7 +164,7 @@ export default function Sidebar({ isOpen, onClose, lang, onAboutClick, onLeaderb
                   
                   <div className="space-y-3">
                     <a
-                      href="#"
+                      href="https://github.com/monir-codes"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center gap-3 text-sm text-zinc-600 dark:text-zinc-400 hover:text-emerald-500 transition-colors"
@@ -173,7 +173,7 @@ export default function Sidebar({ isOpen, onClose, lang, onAboutClick, onLeaderb
                       <span>{t.github}</span>
                     </a>
                     <a
-                      href="https://github.com/monir-codes"
+                      href="https://www.linkedin.com/in/moniruzzaman-rumman"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center gap-3 text-sm text-zinc-600 dark:text-zinc-400 hover:text-emerald-500 transition-colors"
