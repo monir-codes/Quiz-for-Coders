@@ -36,19 +36,19 @@ export default function About({ isOpen, onClose, lang }: AboutProps) {
         <div className="p-6">
           <div className="flex justify-between items-center mb-6">
             <div className="flex items-center gap-3">
-              <img 
-                src="https://storage.googleapis.com/static.ais.studio/quiz-icon.png" 
-                alt="Icon" 
-                className="w-8 h-8 object-contain"
-                referrerPolicy="no-referrer"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.src = "https://picsum.photos/seed/quiz/64/64";
-                }}
-              />
+            <img 
+                  src="https://iili.io/qSG2DvV.png" 
+                  alt="Icon" 
+                  className="w-14 h-14 sm:w-10 sm:h-10 relative z-10 object-cover drop-shadow-xl"
+                  referrerPolicy="no-referrer"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = "https://iili.io/qSG2DvV.png";
+                  }}
+                />
               <div className="flex flex-col -space-y-1">
-                <span className="text-xl font-black tracking-tighter text-zinc-900 dark:text-white uppercase italic">Quiz</span>
-                <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-[0.3em] ml-0.5">for Coders</span>
+              <span className="text-2xl sm:text-4xl font-display text-zinc-800 dark:text-white tracking-[0.2em] sm:tracking-[0.5em] ml-0.2 mb-1 uppercase leading-none font-bold">QUIZ</span>
+                <span className="text-[8px] sm:text-[10px] font-display font-black text-emerald-500 uppercase tracking-[0.3em] sm:tracking-[0.5em] ml-0.2 opacity-90">FOR CODERS</span>
               </div>
             </div>
             <button onClick={onClose} className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-full transition-colors">
