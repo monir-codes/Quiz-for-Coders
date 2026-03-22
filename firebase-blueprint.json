@@ -1,0 +1,41 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "Metadata for authenticated users",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Full name of the user" },
+        "email": { "type": "string", "format": "email", "description": "User's email address" },
+        "profilePic": { "type": "string", "description": "URL to profile picture" },
+        "joinedDate": { "type": "string", "format": "date-time", "description": "When the user first joined" },
+        "role": { "type": "string", "enum": ["user", "admin"], "description": "User role" }
+      },
+      "required": ["name", "email", "joinedDate", "role"]
+    },
+    "QuizResult": {
+      "title": "Quiz Result",
+      "description": "Historical record of a user's quiz performance",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "UID of the user" },
+        "score": { "type": "number", "description": "Number of correct answers" },
+        "totalQuestions": { "type": "number", "description": "Total questions in the quiz" },
+        "timestamp": { "type": "string", "format": "date-time", "description": "When the quiz was completed" },
+        "category": { "type": "string", "description": "Quiz category (e.g., React, Node)" },
+        "language": { "type": "string", "enum": ["EN", "BN"], "description": "Language used for the quiz" }
+      },
+      "required": ["userId", "score", "totalQuestions", "timestamp", "category", "language"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profile documents"
+    },
+    "/results/{resultId}": {
+      "schema": "QuizResult",
+      "description": "Global collection of quiz results"
+    }
+  }
+}

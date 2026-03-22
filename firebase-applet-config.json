@@ -1,0 +1,9 @@
+{
+  "apiKey": "AIzaSyDCNVx-jBOKlXEZGI66ZO0Dtz_HOKDSsrU",
+  "authDomain": "quiz-for-coders.firebaseapp.com",
+  "projectId": "quiz-for-coders",
+  "storageBucket": "quiz-for-coders.firebasestorage.app",
+  "messagingSenderId": "613446340227",
+  "appId": "1:613446340227:web:0a4d686c79893c93b715b6",
+  "firestoreDatabaseId": "(default)"
+}
