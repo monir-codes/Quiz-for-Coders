@@ -23,7 +23,7 @@ export default function Sidebar({ isOpen, onClose, lang, onAboutClick, onLeaderb
       github: 'Monir-Codes',
       linkedin: 'MD. Moniruzzaman',
       description: 'Quiz for Coders is an AI-powered quiz platform for modern developers.',
-      devName: 'Monir',
+      devName: 'MD. Moniruzzaman',
       devRole: 'Web Developer',
       install: 'Install Mobile App',
       installDesc: 'Get the best experience on your mobile device.'
@@ -37,8 +37,8 @@ export default function Sidebar({ isOpen, onClose, lang, onAboutClick, onLeaderb
       github: 'গিটহাব প্রোফাইল',
       linkedin: 'লিঙ্কডইন প্রোফাইল',
       description: 'Quiz for Coders আধুনিক ডেভেলপারদের জন্য একটি এআই-চালিত কুইজ প্ল্যাটফর্ম।',
-      devName: 'মনির',
-      devRole: 'ফুল স্ট্যাক ডেভেলপার',
+      devName: 'মোঃ মনিরুজ্জামান',
+      devRole: 'ওয়েব ডেভেলপার',
       install: 'মোবাইল অ্যাপ ইনস্টল করুন',
       installDesc: 'আপনার মোবাইল ডিভাইসে সেরা অভিজ্ঞতা পান।'
     }
