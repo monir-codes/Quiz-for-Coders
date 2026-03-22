@@ -206,26 +206,8 @@ export default function Dashboard({ lang, onStartQuiz }: DashboardProps) {
       <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
           <div className="flex items-center gap-3 mb-4">
-            <motion.img 
-              whileHover={{ scale: 1.1, rotate: 5 }}
-              whileTap={{ scale: 0.95 }}
-              src="https://picsum.photos/seed/quiz-shield/128/128" 
-              alt="Icon" 
-              className="w-12 h-12 object-contain drop-shadow-xl"
-              referrerPolicy="no-referrer"
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.src = "https://picsum.photos/seed/quiz/128/128";
-              }}
-            />
-            <motion.div 
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="flex flex-col -space-y-1 sm:-space-y-2"
-            >
-              <span className="text-2xl sm:text-4xl font-display tracking-tighter text-zinc-900 dark:text-white uppercase italic leading-none font-black">QUIZ</span>
-              <span className="text-[8px] sm:text-[10px] font-display font-black text-emerald-500 uppercase tracking-[0.3em] sm:tracking-[0.5em] ml-0.5 opacity-90">FOR CODERS</span>
-            </motion.div>
+           
+
           </div>
           <div className="flex items-center gap-4 mb-2">
             <h1 className="text-2xl sm:text-4xl font-bold text-zinc-900 dark:text-white leading-tight">
