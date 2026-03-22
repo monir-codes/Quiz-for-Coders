@@ -141,25 +141,9 @@ export default function Auth({ lang }: AuthProps) {
               className="relative w-16 h-16 sm:w-24 sm:h-24 flex items-center justify-center"
             >
               <div className="absolute inset-0 bg-emerald-500/20 blur-2xl rounded-full"></div>
-              <img 
-                src="https://picsum.photos/seed/quiz-shield/256/256" 
-                alt="Icon" 
-                className="w-12 h-12 sm:w-20 sm:h-20 relative z-10 object-contain drop-shadow-2xl"
-                referrerPolicy="no-referrer"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.src = "https://picsum.photos/seed/quiz/256/256";
-                }}
-              />
+              
             </motion.div>
-            <motion.div 
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="flex flex-col -space-y-1 sm:-space-y-2"
-            >
-              <span className="text-4xl sm:text-6xl font-display tracking-tighter text-zinc-900 dark:text-white uppercase italic leading-none font-black">QUIZ</span>
-              <span className="text-[10px] sm:text-xs font-display font-black text-emerald-500 uppercase tracking-[0.4em] sm:tracking-[0.6em] ml-0.5 sm:ml-1 opacity-90">FOR CODERS</span>
-            </motion.div>
+            
           </div>
           <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-2">
             {isLogin ? t.welcome : t.create}
