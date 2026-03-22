@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { generateQuizQuestions } from '../services/geminiService';
 import { QuizQuestion, Language, QuizResult, Difficulty } from '../types';
+import { getApiUrl } from '../utils/api';
 import { db, auth, handleFirestoreError, OperationType } from '../firebase';
 import { collection, addDoc } from 'firebase/firestore';
 import { CheckCircle2, XCircle, ArrowRight, Loader2, Trophy, RefreshCw, Home, ArrowLeft } from 'lucide-react';
@@ -28,6 +29,8 @@ export default function Quiz({ category, difficulty, lang, onComplete, onExit }:
   const [timeLeft, setTimeLeft] = useState(30);
   const [timerActive, setTimerActive] = useState(false);
 
+  const [error, setError] = useState<string | null>(null);
+
   const translations = {
     EN: {
       loading: 'Generating AI Questions...',
@@ -47,7 +50,8 @@ export default function Quiz({ category, difficulty, lang, onComplete, onExit }:
       home: 'Go Home',
       retry: 'Try Again',
       back: 'Back',
-      timeOut: "Time's Up!"
+      timeOut: "Time's Up!",
+      error: 'Failed to load questions. Please check your API key and connection.'
     },
     BN: {
       loading: 'AI প্রশ্ন তৈরি হচ্ছে...',
@@ -67,7 +71,8 @@ export default function Quiz({ category, difficulty, lang, onComplete, onExit }:
       home: 'হোমে ফিরে যান',
       retry: 'আবার চেষ্টা করুন',
       back: 'পিছনে',
-      timeOut: 'সময় শেষ!'
+      timeOut: 'সময় শেষ!',
+      error: 'প্রশ্ন লোড করতে ব্যর্থ হয়েছে। আপনার API কী এবং কানেকশন চেক করুন।'
     }
   };
 
@@ -78,6 +83,7 @@ export default function Quiz({ category, difficulty, lang, onComplete, onExit }:
   useEffect(() => {
     const loadQuestions = async () => {
       try {
+        setError(null);
         const savedProgress = localStorage.getItem(storageKey);
         if (savedProgress) {
           const parsed = JSON.parse(savedProgress);
@@ -93,15 +99,19 @@ export default function Quiz({ category, difficulty, lang, onComplete, onExit }:
         }
 
         const data = await generateQuizQuestions(category, lang, difficulty);
+        if (!data || data.length === 0) {
+          throw new Error('No questions generated');
+        }
         setQuestions(data);
       } catch (err) {
         console.error('Error loading questions:', err);
+        setError(t.error);
       } finally {
         setLoading(false);
       }
     };
     loadQuestions();
-  }, [category, lang, difficulty, storageKey]);
+  }, [category, lang, difficulty, storageKey, t.error]);
 
   useEffect(() => {
     if (questions.length > 0 && !finished && !showExplanation) {
@@ -174,7 +184,7 @@ export default function Quiz({ category, difficulty, lang, onComplete, onExit }:
         };
         
         try {
-          await fetch('/api/results', {
+          await fetch(getApiUrl('/api/results'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(result)
@@ -195,18 +205,26 @@ export default function Quiz({ category, difficulty, lang, onComplete, onExit }:
     );
   }
 
-  if (questions.length === 0) {
+  if (error) {
     return (
       <div className="min-h-[calc(100vh-64px)] flex flex-col items-center justify-center p-4 text-center">
         <XCircle className="text-red-500 mb-4" size={48} />
-        <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-2">Failed to load questions</h2>
-        <p className="text-zinc-500 mb-8">Please check your internet connection or API key and try again.</p>
+        <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-2">{t.error}</h2>
         <button
           onClick={onExit}
           className="px-8 py-3 bg-emerald-500 text-white font-bold rounded-2xl hover:bg-emerald-600 transition-all"
         >
           {t.home}
         </button>
+      </div>
+    );
+  }
+
+  if (questions.length === 0) {
+    return (
+      <div className="min-h-[calc(100vh-64px)] flex flex-col items-center justify-center p-4 text-center">
+        <Loader2 className="animate-spin text-emerald-500 mb-4" size={48} />
+        <p className="text-xl font-bold text-zinc-900 dark:text-white">{t.loading}</p>
       </div>
     );
   }
@@ -291,7 +309,7 @@ export default function Quiz({ category, difficulty, lang, onComplete, onExit }:
 
       <motion.div 
         layout
-        className="bg-white dark:bg-zinc-900 rounded-[48px] p-8 sm:p-14 shadow-2xl border border-zinc-200 dark:border-zinc-800 relative overflow-hidden"
+        className="bg-white dark:bg-zinc-900 rounded-[32px] sm:rounded-[48px] p-6 sm:p-14 shadow-2xl border border-zinc-200 dark:border-zinc-800 relative overflow-hidden"
       >
         {/* Timer Progress Bar */}
         <div className="absolute top-0 left-0 w-full h-1 bg-zinc-100 dark:bg-zinc-800">
@@ -306,7 +324,7 @@ export default function Quiz({ category, difficulty, lang, onComplete, onExit }:
         {/* Subtle background pattern for the quiz box */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 blur-[80px] rounded-full -mr-32 -mt-32 pointer-events-none"></div>
         
-        <h2 className="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-white mb-10 leading-tight relative z-10">
+        <h2 className="text-xl sm:text-3xl font-black text-zinc-900 dark:text-white mb-8 sm:mb-12 leading-[1.2] relative z-10 tracking-tight">
           {currentQuestion.question}
         </h2>
 
@@ -332,7 +350,7 @@ export default function Quiz({ category, difficulty, lang, onComplete, onExit }:
                 whileTap={!showExplanation ? { scale: 0.99 } : {}}
                 onClick={() => handleOptionSelect(idx)}
                 disabled={showExplanation}
-                className={`w-full p-6 text-left rounded-[24px] border-2 transition-all flex items-center justify-between group relative overflow-hidden
+                className={`w-full p-4 sm:p-6 text-left rounded-[20px] sm:rounded-[24px] border-2 transition-all flex items-center justify-between group relative overflow-hidden
                   ${isSelected ? 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-900/10' : 'border-zinc-100 dark:border-zinc-800 hover:border-emerald-500/50 hover:bg-zinc-50 dark:hover:bg-zinc-800/50'}
                   ${showCorrect ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20' : ''}
                   ${showWrong ? 'border-red-500 bg-red-50 dark:bg-red-900/20' : ''}
@@ -374,35 +392,35 @@ export default function Quiz({ category, difficulty, lang, onComplete, onExit }:
               exit={{ opacity: 0, height: 0 }}
               className="overflow-hidden"
             >
-              <div className="mb-8 p-8 bg-zinc-50 dark:bg-zinc-800/50 rounded-[32px] border border-zinc-100 dark:border-zinc-700">
-                <div className="flex flex-col gap-4 mb-6">
-                  <div className="flex items-center gap-2">
-                    <div className="w-1.5 h-4 bg-emerald-500 rounded-full"></div>
-                    <h4 className="text-xs font-black uppercase tracking-[0.2em] text-zinc-400">{t.explanation}</h4>
+              <div className="mt-6 mb-10 p-6 sm:p-10 bg-zinc-50 dark:bg-zinc-800/50 rounded-[32px] sm:rounded-[40px] border border-zinc-100 dark:border-zinc-700 shadow-inner">
+                <div className="flex flex-col gap-4 sm:gap-6 mb-6 sm:mb-8">
+                  <div className="flex items-center gap-3">
+                    <div className="w-1.5 sm:w-2 h-4 sm:h-5 bg-emerald-500 rounded-full"></div>
+                    <h4 className="text-[10px] sm:text-sm font-black uppercase tracking-[0.2em] sm:tracking-[0.3em] text-zinc-400">{t.explanation}</h4>
                   </div>
                   
                   {selectedOption !== null && selectedOption !== currentQuestion.correct && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="p-4 bg-red-500/5 rounded-2xl border border-red-500/10">
-                        <p className="text-[10px] uppercase font-black tracking-widest text-red-500 mb-1">{t.yourAnswer}</p>
-                        <p className="text-sm font-bold text-red-600 dark:text-red-400">{currentQuestion.options[selectedOption]}</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                      <div className="p-4 sm:p-6 bg-red-500/5 rounded-2xl sm:rounded-3xl border border-red-500/10">
+                        <p className="text-[10px] sm:text-[11px] uppercase font-black tracking-widest text-red-500 mb-1 sm:mb-2">{t.yourAnswer}</p>
+                        <p className="text-sm sm:text-base font-bold text-red-600 dark:text-red-400">{currentQuestion.options[selectedOption]}</p>
                       </div>
-                      <div className="p-4 bg-emerald-500/5 rounded-2xl border border-emerald-500/10">
-                        <p className="text-[10px] uppercase font-black tracking-widest text-emerald-500 mb-1">{t.correctAnswer}</p>
-                        <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400">{currentQuestion.options[currentQuestion.correct]}</p>
+                      <div className="p-4 sm:p-6 bg-emerald-500/5 rounded-2xl sm:rounded-3xl border border-emerald-500/10">
+                        <p className="text-[10px] sm:text-[11px] uppercase font-black tracking-widest text-emerald-500 mb-1 sm:mb-2">{t.correctAnswer}</p>
+                        <p className="text-sm sm:text-base font-bold text-emerald-600 dark:text-emerald-400">{currentQuestion.options[currentQuestion.correct]}</p>
                       </div>
                     </div>
                   )}
                   
                   {selectedOption === null && (
-                    <div className="p-4 bg-red-500/5 rounded-2xl border border-red-500/10 mb-4">
-                      <p className="text-[10px] uppercase font-black tracking-widest text-red-500 mb-1">{t.correctAnswer}</p>
-                      <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400">{currentQuestion.options[currentQuestion.correct]}</p>
+                    <div className="p-4 sm:p-6 bg-red-500/5 rounded-2xl sm:rounded-3xl border border-red-500/10 mb-6">
+                      <p className="text-[10px] sm:text-[11px] uppercase font-black tracking-widest text-red-500 mb-1 sm:mb-2">{t.correctAnswer}</p>
+                      <p className="text-sm sm:text-base font-bold text-emerald-600 dark:text-emerald-400">{currentQuestion.options[currentQuestion.correct]}</p>
                     </div>
                   )}
                 </div>
                 
-                <div className="text-zinc-700 dark:text-zinc-300 text-sm leading-relaxed prose dark:prose-invert max-w-none">
+                <div className="text-zinc-700 dark:text-zinc-300 text-sm sm:text-lg leading-relaxed prose dark:prose-invert max-w-none font-medium">
                   <ReactMarkdown>{currentQuestion.explanation}</ReactMarkdown>
                 </div>
               </div>
@@ -410,11 +428,13 @@ export default function Quiz({ category, difficulty, lang, onComplete, onExit }:
               <motion.button
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
+                whileHover={{ scale: 1.02, y: -2 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={handleNext}
-                className="w-full py-5 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-black rounded-2xl hover:opacity-90 transition-all flex items-center justify-center gap-3 group shadow-xl shadow-zinc-900/10 dark:shadow-white/5"
+                className="w-full py-6 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-black rounded-3xl hover:opacity-90 transition-all flex items-center justify-center gap-3 group shadow-2xl shadow-zinc-900/20 dark:shadow-white/10"
               >
                 {currentIndex === questions.length - 1 ? t.finish : t.next}
-                <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+                <ArrowRight size={22} className="group-hover:translate-x-1 transition-transform" />
               </motion.button>
             </motion.div>
           )}

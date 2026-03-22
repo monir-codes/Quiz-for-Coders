@@ -9,6 +9,7 @@ import {
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { Mail, Lock, User, LogIn, UserPlus, Github, Chrome } from 'lucide-react';
 import { Language } from '../types';
+import { getApiUrl } from '../utils/api';
 import { motion } from 'motion/react';
 
 interface AuthProps {
@@ -71,7 +72,7 @@ export default function Auth({ lang }: AuthProps) {
         const user = userCredential.user;
         
         try {
-          await fetch('/api/users', {
+          await fetch(getApiUrl('/api/users'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -98,7 +99,7 @@ export default function Auth({ lang }: AuthProps) {
       const user = result.user;
       
       try {
-        await fetch('/api/users', {
+        await fetch(getApiUrl('/api/users'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -133,30 +134,31 @@ export default function Auth({ lang }: AuthProps) {
     <div className="min-h-[calc(100vh-64px)] flex items-center justify-center p-4 bg-zinc-50 dark:bg-zinc-950">
       <div className="w-full max-w-md bg-white dark:bg-zinc-900 rounded-[32px] shadow-2xl border border-zinc-200 dark:border-zinc-800 p-8">
         <div className="text-center mb-8">
-          <div className="flex flex-col items-center gap-4 mb-6">
+          <div className="flex flex-col items-center gap-4 mb-8">
             <motion.div 
               whileHover={{ scale: 1.1, rotate: 5 }}
-              className="relative w-20 h-20 flex items-center justify-center"
+              whileTap={{ scale: 0.95 }}
+              className="relative w-16 h-16 sm:w-24 sm:h-24 flex items-center justify-center"
             >
-              <div className="absolute inset-0 bg-emerald-500/20 blur-xl rounded-full"></div>
+              <div className="absolute inset-0 bg-emerald-500/20 blur-2xl rounded-full"></div>
               <img 
-                src="https://storage.googleapis.com/static.ais.studio/quiz-icon.png" 
+                src="https://picsum.photos/seed/quiz-shield/256/256" 
                 alt="Icon" 
-                className="w-16 h-16 relative z-10 object-contain drop-shadow-lg"
+                className="w-12 h-12 sm:w-20 sm:h-20 relative z-10 object-contain drop-shadow-2xl"
                 referrerPolicy="no-referrer"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
-                  target.src = "https://picsum.photos/seed/quiz/128/128";
+                  target.src = "https://picsum.photos/seed/quiz/256/256";
                 }}
               />
             </motion.div>
             <motion.div 
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="flex flex-col -space-y-2"
+              className="flex flex-col -space-y-1 sm:-space-y-2"
             >
-              <span className="text-5xl font-display tracking-wider text-zinc-900 dark:text-white uppercase italic leading-none">QUIZ</span>
-              <span className="text-sm font-bold text-emerald-500 uppercase tracking-[0.5em] ml-1">FOR CODERS</span>
+              <span className="text-4xl sm:text-6xl font-display tracking-tighter text-zinc-900 dark:text-white uppercase italic leading-none font-black">QUIZ</span>
+              <span className="text-[10px] sm:text-xs font-display font-black text-emerald-500 uppercase tracking-[0.4em] sm:tracking-[0.6em] ml-0.5 sm:ml-1 opacity-90">FOR CODERS</span>
             </motion.div>
           </div>
           <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-2">
@@ -236,14 +238,16 @@ export default function Auth({ lang }: AuthProps) {
             </div>
           )}
 
-          <button
+          <motion.button
             type="submit"
             disabled={loading}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             className="w-full py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-2xl shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
           >
             {isLogin ? <LogIn size={20} /> : <UserPlus size={20} />}
             {isLogin ? t.login : t.signup}
-          </button>
+          </motion.button>
         </form>
 
         <div className="relative my-8">
@@ -255,13 +259,15 @@ export default function Auth({ lang }: AuthProps) {
           </div>
         </div>
 
-        <button
+        <motion.button
           onClick={handleGoogleLogin}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
           className="w-full py-4 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-200 font-semibold rounded-2xl hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-all flex items-center justify-center gap-3"
         >
           <Chrome size={20} className="text-emerald-500" />
           {t.google}
-        </button>
+        </motion.button>
       </div>
     </div>
   );

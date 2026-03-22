@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Language } from '../types';
+import { getApiUrl } from '../utils/api';
 import { motion } from 'motion/react';
 import { Trophy, Medal, Crown, ArrowLeft, Loader2, User, Search } from 'lucide-react';
 
@@ -62,7 +63,7 @@ export default function Leaderboard({ lang, onBack }: LeaderboardProps) {
   useEffect(() => {
     const fetchLeaderboard = async () => {
       try {
-        const res = await fetch('/api/leaderboard');
+        const res = await fetch(getApiUrl('/api/leaderboard'));
         if (res.ok) {
           const data = await res.json();
           setEntries(data);
@@ -106,7 +107,7 @@ export default function Leaderboard({ lang, onBack }: LeaderboardProps) {
               <div className="p-3 bg-emerald-500 text-white rounded-2xl shadow-lg shadow-emerald-500/20">
                 <Trophy size={32} />
               </div>
-              <h1 className="text-4xl font-black text-zinc-900 dark:text-white uppercase tracking-tight">
+              <h1 className="text-2xl sm:text-4xl font-black text-zinc-900 dark:text-white uppercase tracking-tight">
                 {t.title}
               </h1>
             </div>
@@ -192,58 +193,60 @@ export default function Leaderboard({ lang, onBack }: LeaderboardProps) {
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="bg-white dark:bg-zinc-900 rounded-[40px] border border-zinc-200 dark:border-zinc-800 shadow-sm overflow-hidden"
+              className="bg-white dark:bg-zinc-900 rounded-[32px] sm:rounded-[40px] border border-zinc-200 dark:border-zinc-800 shadow-sm overflow-hidden"
             >
-              <table className="w-full text-left border-collapse">
-                <thead className="bg-zinc-50 dark:bg-zinc-800/50">
-                  <tr>
-                    <th className="px-8 py-4 text-xs font-black uppercase tracking-widest text-zinc-400">{t.rank}</th>
-                    <th className="px-8 py-4 text-xs font-black uppercase tracking-widest text-zinc-400">{t.developer}</th>
-                    <th className="px-8 py-4 text-xs font-black uppercase tracking-widest text-zinc-400">{t.totalScore}</th>
-                    <th className="px-8 py-4 text-xs font-black uppercase tracking-widest text-zinc-400">{t.quizzes}</th>
-                    <th className="px-8 py-4 text-xs font-black uppercase tracking-widest text-zinc-400 text-right">{t.avg}</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
-                  {(searchTerm !== '' ? filteredEntries : entries.slice(3)).map((entry, idx) => {
-                    const originalRank = entries.findIndex(e => e.uid === entry.uid) + 1;
-                    return (
-                      <motion.tr 
-                        key={entry.uid}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: idx * 0.05 }}
-                        className="hover:bg-zinc-50 dark:hover:bg-zinc-800/30 transition-colors"
-                      >
-                        <td className="px-8 py-5">
-                          <span className="text-lg font-black text-zinc-300 dark:text-zinc-700">#{originalRank}</span>
-                        </td>
-                        <td className="px-8 py-5">
-                          <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden flex items-center justify-center border border-zinc-200 dark:border-zinc-700">
-                              {entry.profilePic ? (
-                                <img src={entry.profilePic} alt={entry.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-                              ) : (
-                                <User size={20} className="text-zinc-400" />
-                              )}
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse min-w-[600px] sm:min-w-0">
+                  <thead className="bg-zinc-50 dark:bg-zinc-800/50">
+                    <tr>
+                      <th className="px-6 sm:px-8 py-4 text-xs font-black uppercase tracking-widest text-zinc-400">{t.rank}</th>
+                      <th className="px-6 sm:px-8 py-4 text-xs font-black uppercase tracking-widest text-zinc-400">{t.developer}</th>
+                      <th className="px-6 sm:px-8 py-4 text-xs font-black uppercase tracking-widest text-zinc-400">{t.totalScore}</th>
+                      <th className="px-6 sm:px-8 py-4 text-xs font-black uppercase tracking-widest text-zinc-400">{t.quizzes}</th>
+                      <th className="px-6 sm:px-8 py-4 text-xs font-black uppercase tracking-widest text-zinc-400 text-right">{t.avg}</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
+                    {(searchTerm !== '' ? filteredEntries : entries.slice(3)).map((entry, idx) => {
+                      const originalRank = entries.findIndex(e => e.uid === entry.uid) + 1;
+                      return (
+                        <motion.tr 
+                          key={entry.uid}
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: idx * 0.05 }}
+                          className="hover:bg-zinc-50 dark:hover:bg-zinc-800/30 transition-colors"
+                        >
+                          <td className="px-6 sm:px-8 py-5">
+                            <span className="text-lg font-black text-zinc-300 dark:text-zinc-700">#{originalRank}</span>
+                          </td>
+                          <td className="px-6 sm:px-8 py-5">
+                            <div className="flex items-center gap-4">
+                              <div className="w-10 h-10 rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden flex items-center justify-center border border-zinc-200 dark:border-zinc-700">
+                                {entry.profilePic ? (
+                                  <img src={entry.profilePic} alt={entry.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                                ) : (
+                                  <User size={20} className="text-zinc-400" />
+                                )}
+                              </div>
+                              <span className="font-bold text-zinc-900 dark:text-white">{entry.name}</span>
                             </div>
-                            <span className="font-bold text-zinc-900 dark:text-white">{entry.name}</span>
-                          </div>
-                        </td>
-                        <td className="px-8 py-5">
-                          <span className="font-black text-emerald-500">{entry.totalScore}</span>
-                        </td>
-                        <td className="px-8 py-5 text-sm text-zinc-500 font-medium">
-                          {entry.quizzesTaken}
-                        </td>
-                        <td className="px-8 py-5 text-right">
-                          <span className="text-sm font-black text-zinc-900 dark:text-white">{Math.round(entry.avgPercentage)}%</span>
-                        </td>
-                      </motion.tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                          </td>
+                          <td className="px-6 sm:px-8 py-5">
+                            <span className="font-black text-emerald-500">{entry.totalScore}</span>
+                          </td>
+                          <td className="px-6 sm:px-8 py-5 text-sm text-zinc-500 font-medium">
+                            {entry.quizzesTaken}
+                          </td>
+                          <td className="px-6 sm:px-8 py-5 text-right">
+                            <span className="text-sm font-black text-zinc-900 dark:text-white">{Math.round(entry.avgPercentage)}%</span>
+                          </td>
+                        </motion.tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             </motion.div>
           )}
         </div>

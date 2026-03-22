@@ -40,14 +40,41 @@ export default function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-zinc-950">
-        <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-zinc-50 dark:bg-zinc-950">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="relative"
+        >
+          <div className="w-20 h-20 border-4 border-emerald-500/20 rounded-full"></div>
+          <motion.div 
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            className="absolute inset-0 w-20 h-20 border-4 border-emerald-500 border-t-transparent rounded-full"
+          />
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: [0.4, 1, 0.4] }}
+            transition={{ duration: 2, repeat: Infinity }}
+            className="absolute inset-0 flex items-center justify-center"
+          >
+            <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+          </motion.div>
+        </motion.div>
+        <motion.p 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="mt-6 text-sm font-black uppercase tracking-[0.3em] text-emerald-500 animate-pulse"
+        >
+          Initializing Quiz...
+        </motion.p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 transition-colors duration-300">
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 transition-colors duration-300 overflow-x-hidden relative">
       <Navbar 
         theme={theme} 
         setTheme={setTheme} 
@@ -68,7 +95,7 @@ export default function App() {
         onHomeClick={() => { setView('dashboard'); setIsSidebarOpen(false); setActiveQuiz(null); }}
       />
 
-      <main className="relative">
+      <main className="relative z-10">
         <AnimatePresence mode="wait">
           {!user ? (
             <motion.div
@@ -135,27 +162,25 @@ export default function App() {
         lang={lang} 
       />
 
-      {/* Background Accents & Animation */}
-      <div className="fixed inset-0 pointer-events-none z-[-1] overflow-hidden bg-zinc-50 dark:bg-zinc-950">
+      {/* Background Accents & Animation - Optimized for performance */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden bg-zinc-50 dark:bg-zinc-950 bg-grid">
         <motion.div 
           animate={{ 
-            scale: [1, 1.2, 1],
-            x: [0, 50, 0],
-            y: [0, 30, 0]
+            x: [0, 40, 0],
+            y: [0, 20, 0]
           }}
           transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-          className="absolute -top-[10%] -left-[10%] w-[60%] h-[60%] bg-emerald-500/5 dark:bg-emerald-500/10 blur-[120px] rounded-full"
+          className="absolute -top-[10%] -left-[10%] w-[60%] h-[60%] bg-emerald-500/10 dark:bg-emerald-500/20 blur-[120px] rounded-full will-change-transform"
         />
         <motion.div 
           animate={{ 
-            scale: [1, 1.3, 1],
-            x: [0, -40, 0],
-            y: [0, -20, 0]
+            x: [0, -30, 0],
+            y: [0, -15, 0]
           }}
           transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-          className="absolute -bottom-[10%] -right-[10%] w-[60%] h-[60%] bg-blue-500/5 dark:bg-blue-500/10 blur-[120px] rounded-full"
+          className="absolute -bottom-[10%] -right-[10%] w-[60%] h-[60%] bg-blue-500/10 dark:bg-blue-500/20 blur-[120px] rounded-full will-change-transform"
         />
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] dark:opacity-[0.05] mix-blend-overlay"></div>
+        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.05] dark:opacity-[0.08] mix-blend-overlay"></div>
       </div>
     </div>
   );

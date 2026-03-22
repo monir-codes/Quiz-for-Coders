@@ -26,4 +26,11 @@
   .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     background: #3f3f46;
   }
+  .bg-grid {
+    background-size: 40px 40px;
+    background-image: radial-gradient(circle, rgba(0,0,0,0.05) 1px, transparent 1px);
+  }
+  .dark .bg-grid {
+    background-image: radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px);
+  }
 }

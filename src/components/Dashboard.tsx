@@ -3,6 +3,7 @@ import { db, auth } from '../firebase';
 import { collection, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
 import { Code2, Server, Database, Layout, Play, Trophy, Clock, ChevronRight, TrendingUp, Github, Zap } from 'lucide-react';
 import { Language, QuizResult, UserProfile, Difficulty } from '../types';
+import { getApiUrl } from '../utils/api';
 import { motion } from 'motion/react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import CountUp from 'react-countup';
@@ -84,20 +85,39 @@ export default function Dashboard({ lang, onStartQuiz }: DashboardProps) {
 
   const t = translations[lang];
 
+  const [backendStatus, setBackendStatus] = useState<'online' | 'offline' | 'checking'>('checking');
+
+  useEffect(() => {
+    const checkBackend = async () => {
+      try {
+        const res = await fetch(getApiUrl('/api/health'));
+        if (res.ok) {
+          setBackendStatus('online');
+        } else {
+          setBackendStatus('offline');
+        }
+      } catch (err) {
+        console.error('Backend health check failed:', err);
+        setBackendStatus('offline');
+      }
+    };
+    checkBackend();
+  }, []);
+
   useEffect(() => {
     const fetchData = async () => {
       if (!auth.currentUser) return;
 
       try {
         // Fetch results from MongoDB API
-        const resultsRes = await fetch(`/api/results/${auth.currentUser.uid}`);
+        const resultsRes = await fetch(getApiUrl(`/api/results/${auth.currentUser.uid}`));
         if (resultsRes.ok) {
           const resultsData = await resultsRes.json();
           setResults(resultsData);
         }
 
         // Fetch profile from MongoDB API
-        const userRes = await fetch(`/api/users/${auth.currentUser.uid}`);
+        const userRes = await fetch(getApiUrl(`/api/users/${auth.currentUser.uid}`));
         if (userRes.ok) {
           const userData = await userRes.json();
           setProfile(userData);
@@ -188,27 +208,37 @@ export default function Dashboard({ lang, onStartQuiz }: DashboardProps) {
           <div className="flex items-center gap-3 mb-4">
             <motion.img 
               whileHover={{ scale: 1.1, rotate: 5 }}
-              src="https://storage.googleapis.com/static.ais.studio/quiz-icon.png" 
+              whileTap={{ scale: 0.95 }}
+              src="https://picsum.photos/seed/quiz-shield/128/128" 
               alt="Icon" 
-              className="w-10 h-10 object-contain"
+              className="w-12 h-12 object-contain drop-shadow-xl"
               referrerPolicy="no-referrer"
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
-                target.src = "https://picsum.photos/seed/quiz/64/64";
+                target.src = "https://picsum.photos/seed/quiz/128/128";
               }}
             />
             <motion.div 
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
-              className="flex flex-col -space-y-1"
+              className="flex flex-col -space-y-1 sm:-space-y-2"
             >
-              <span className="text-2xl font-display tracking-wider text-zinc-900 dark:text-white uppercase italic leading-none">QUIZ</span>
-              <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-[0.4em] ml-0.5">FOR CODERS</span>
+              <span className="text-2xl sm:text-4xl font-display tracking-tighter text-zinc-900 dark:text-white uppercase italic leading-none font-black">QUIZ</span>
+              <span className="text-[8px] sm:text-[10px] font-display font-black text-emerald-500 uppercase tracking-[0.3em] sm:tracking-[0.5em] ml-0.5 opacity-90">FOR CODERS</span>
             </motion.div>
           </div>
-          <h1 className="text-4xl font-bold text-zinc-900 dark:text-white mb-2">
-            {t.welcome} <span className="text-emerald-500">{profile?.name || auth.currentUser?.displayName || 'Developer'}</span>
-          </h1>
+          <div className="flex items-center gap-4 mb-2">
+            <h1 className="text-2xl sm:text-4xl font-bold text-zinc-900 dark:text-white leading-tight">
+              {t.welcome} <span className="text-emerald-500">{profile?.name || auth.currentUser?.displayName || 'Developer'}</span>
+            </h1>
+            {backendStatus !== 'online' && (
+              <div className={`px-3 py-1 rounded-full text-[9px] sm:text-[10px] font-bold uppercase tracking-wider whitespace-nowrap ${
+                backendStatus === 'offline' ? 'bg-red-100 text-red-600 dark:bg-red-900/20 dark:text-red-400' : 'bg-zinc-100 text-zinc-500 dark:bg-zinc-800'
+              }`}>
+                {backendStatus === 'offline' ? 'Backend Offline' : 'Checking...'}
+              </div>
+            )}
+          </div>
           <p className="text-zinc-500 dark:text-zinc-400">Ready to test your MERN stack knowledge today?</p>
         </div>
       </div>
@@ -226,16 +256,16 @@ export default function Dashboard({ lang, onStartQuiz }: DashboardProps) {
               </div>
               <h3 className="font-bold text-zinc-900 dark:text-white">{t.stats}</h3>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-xs text-zinc-500 uppercase font-bold tracking-wider mb-1">{t.totalQuizzes}</p>
-                <p className="text-2xl font-bold text-zinc-900 dark:text-white">
+            <div className="grid grid-cols-2 gap-4 text-center">
+              <div className="flex flex-col items-center justify-center p-4 bg-zinc-50 dark:bg-zinc-800/50 rounded-2xl border border-zinc-100 dark:border-zinc-800">
+                <p className="text-[10px] text-zinc-500 uppercase font-black tracking-widest mb-2">{t.totalQuizzes}</p>
+                <p className="text-3xl font-display font-black text-zinc-900 dark:text-white">
                   <CountUp end={results.length} duration={2} />
                 </p>
               </div>
-              <div>
-                <p className="text-xs text-zinc-500 uppercase font-bold tracking-wider mb-1">{t.avgScore}</p>
-                <p className="text-2xl font-bold text-zinc-900 dark:text-white">
+              <div className="flex flex-col items-center justify-center p-4 bg-zinc-50 dark:bg-zinc-800/50 rounded-2xl border border-zinc-100 dark:border-zinc-800">
+                <p className="text-[10px] text-zinc-500 uppercase font-black tracking-widest mb-2">{t.avgScore}</p>
+                <p className="text-3xl font-display font-black text-emerald-500">
                   <CountUp end={avgScore} duration={2} suffix="%" />
                 </p>
               </div>
@@ -407,24 +437,26 @@ export default function Dashboard({ lang, onStartQuiz }: DashboardProps) {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
         <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">{t.categories}</h2>
         
-        <div className="flex items-center gap-2 p-1.5 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
-          <div className="px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-zinc-400 border-r border-zinc-100 dark:border-zinc-800 mr-1">
+        <div className="flex flex-wrap items-center gap-2 p-1.5 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
+          <div className="px-3 py-1.5 text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-zinc-400 border-r border-zinc-100 dark:border-zinc-800 mr-1">
             {t.difficulty}
           </div>
           {difficulties.map((diff) => (
-            <button
+            <motion.button
               key={diff.id}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={() => setSelectedDifficulty(diff.id)}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2
+              className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-[10px] sm:text-xs font-bold transition-all flex items-center gap-1.5 sm:gap-2
                 ${selectedDifficulty === diff.id 
                   ? `${diff.color} shadow-inner` 
                   : 'text-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-800'
                 }
               `}
             >
-              <Zap size={14} className={selectedDifficulty === diff.id ? 'fill-current' : ''} />
+              <Zap size={12} className={selectedDifficulty === diff.id ? 'fill-current' : ''} />
               {diff.label}
-            </button>
+            </motion.button>
           ))}
         </div>
       </div>
@@ -435,10 +467,12 @@ export default function Dashboard({ lang, onStartQuiz }: DashboardProps) {
           const profLabel = getProficiencyLabel(mastery);
           
           return (
-            <button
+            <motion.button
               key={cat.id}
+              whileHover={{ scale: 1.02, y: -8 }}
+              whileTap={{ scale: 0.98 }}
               onClick={() => onStartQuiz(cat.id, selectedDifficulty)}
-              className="group relative bg-white dark:bg-zinc-900 p-8 rounded-[40px] border border-zinc-200 dark:border-zinc-800 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all text-left overflow-hidden flex flex-col h-full min-h-[280px]"
+              className="group relative bg-white dark:bg-zinc-900 p-8 rounded-[40px] border border-zinc-200 dark:border-zinc-800 shadow-sm hover:shadow-2xl transition-all text-left overflow-hidden flex flex-col h-full min-h-[280px]"
             >
               <div className={`w-16 h-16 ${cat.color} rounded-3xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-inner`}>
                 {React.cloneElement(cat.icon as React.ReactElement<any>, { size: 32 })}
@@ -475,7 +509,7 @@ export default function Dashboard({ lang, onStartQuiz }: DashboardProps) {
               <div className="absolute -bottom-4 -right-4 opacity-5 group-hover:opacity-10 transition-opacity pointer-events-none">
                  {React.cloneElement(cat.icon as React.ReactElement<any>, { size: 140 })}
               </div>
-            </button>
+            </motion.button>
           );
         })}
       </div>

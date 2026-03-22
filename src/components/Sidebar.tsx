@@ -69,20 +69,26 @@ export default function Sidebar({ isOpen, onClose, lang, onAboutClick, onLeaderb
           >
             <div className="p-6 border-b border-zinc-200 dark:border-zinc-800 flex justify-between items-center">
               <div className="flex items-center gap-3">
-                <motion.img 
+                <motion.div 
                   whileHover={{ scale: 1.1, rotate: 5 }}
-                  src="https://storage.googleapis.com/static.ais.studio/quiz-icon.png" 
-                  alt="Icon" 
-                  className="w-8 h-8 object-contain"
-                  referrerPolicy="no-referrer"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src = "https://picsum.photos/seed/quiz/64/64";
-                  }}
-                />
+                  whileTap={{ scale: 0.95 }}
+                  className="relative w-10 h-10 flex items-center justify-center"
+                >
+                  <div className="absolute inset-0 bg-emerald-500/20 blur-lg rounded-full"></div>
+                  <img 
+                    src="https://picsum.photos/seed/quiz-shield/128/128" 
+                    alt="Icon" 
+                    className="w-8 h-8 relative z-10 object-contain drop-shadow-xl"
+                    referrerPolicy="no-referrer"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = "https://picsum.photos/seed/quiz/128/128";
+                    }}
+                  />
+                </motion.div>
                 <div className="flex flex-col -space-y-1">
-                  <span className="text-2xl font-display tracking-wider text-zinc-900 dark:text-white uppercase italic leading-none">QUIZ</span>
-                  <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-[0.4em] ml-0.5">FOR CODERS</span>
+                  <span className="text-2xl font-display tracking-tighter text-zinc-900 dark:text-white uppercase italic leading-none font-black">QUIZ</span>
+                  <span className="text-[8px] font-display font-black text-emerald-500 uppercase tracking-[0.3em] ml-0.5 opacity-90">FOR CODERS</span>
                 </div>
               </div>
               <button

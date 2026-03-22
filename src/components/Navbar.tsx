@@ -46,27 +46,28 @@ export default function Navbar({ theme, setTheme, lang, setLang, onAboutClick, o
             >
               <motion.div 
                 whileHover={{ scale: 1.1, rotate: 5 }}
-                className="relative w-10 h-10 flex items-center justify-center"
+                whileTap={{ scale: 0.95 }}
+                className="relative w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center"
               >
                 <div className="absolute inset-0 bg-emerald-500/20 blur-lg rounded-full group-hover:bg-emerald-500/30 transition-colors"></div>
                 <img 
-                  src="https://storage.googleapis.com/static.ais.studio/quiz-icon.png" 
+                  src="https://picsum.photos/seed/quiz-shield/128/128" 
                   alt="Icon" 
-                  className="w-8 h-8 relative z-10 object-contain drop-shadow-md"
+                  className="w-8 h-8 sm:w-10 sm:h-10 relative z-10 object-contain drop-shadow-xl"
                   referrerPolicy="no-referrer"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
-                    target.src = "https://picsum.photos/seed/quiz/64/64";
+                    target.src = "https://picsum.photos/seed/quiz/128/128";
                   }}
                 />
               </motion.div>
               <motion.div 
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="flex flex-col -space-y-1"
+                className="flex flex-col -space-y-1 sm:-space-y-2"
               >
-                <span className="text-2xl font-display tracking-wider text-zinc-900 dark:text-white uppercase italic leading-none">QUIZ</span>
-                <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-[0.4em] ml-0.5">FOR CODERS</span>
+                <span className="text-2xl sm:text-4xl font-display tracking-tighter text-zinc-900 dark:text-white uppercase italic leading-none font-black">QUIZ</span>
+                <span className="text-[8px] sm:text-[10px] font-display font-black text-emerald-500 uppercase tracking-[0.3em] sm:tracking-[0.5em] ml-0.5 opacity-90">FOR CODERS</span>
               </motion.div>
             </button>
           </div>
