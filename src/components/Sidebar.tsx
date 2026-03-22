@@ -20,11 +20,11 @@ export default function Sidebar({ isOpen, onClose, lang, onAboutClick, onLeaderb
       about: 'About App',
       developer: 'Developer Info',
       contact: 'Contact',
-      github: 'GitHub Profile',
-      linkedin: 'LinkedIn Profile',
+      github: 'Monir-Codes',
+      linkedin: 'MD. Moniruzzaman',
       description: 'Quiz for Coders is an AI-powered quiz platform for modern developers.',
       devName: 'Monir',
-      devRole: 'Full Stack Developer',
+      devRole: 'Web Developer',
       install: 'Install Mobile App',
       installDesc: 'Get the best experience on your mobile device.'
     },
@@ -173,7 +173,7 @@ export default function Sidebar({ isOpen, onClose, lang, onAboutClick, onLeaderb
                       <span>{t.github}</span>
                     </a>
                     <a
-                      href="#"
+                      href="https://github.com/monir-codes"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center gap-3 text-sm text-zinc-600 dark:text-zinc-400 hover:text-emerald-500 transition-colors"
@@ -183,7 +183,7 @@ export default function Sidebar({ isOpen, onClose, lang, onAboutClick, onLeaderb
                     </a>
                     <div className="flex items-center gap-3 text-sm text-zinc-600 dark:text-zinc-400">
                       <Mail size={18} />
-                      <span>monir@example.com</span>
+                      <span>monir.webdev@gmail.com</span>
                     </div>
                   </div>
                 </div>
