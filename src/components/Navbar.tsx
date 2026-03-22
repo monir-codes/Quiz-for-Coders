@@ -66,7 +66,7 @@ export default function Navbar({ theme, setTheme, lang, setLang, onAboutClick, o
                 animate={{ opacity: 1, x: 0 }}
                 className="flex flex-col -space-y-1 sm:-space-y-2"
               >
-                <span className="text-2xl sm:text-4xl font-display tracking-tighter text-zinc-900 dark:text-white uppercase italic leading-none font-black">QUIZ</span>
+                <span className="text-[8px] sm:text-[10px] font-display font-black text-emerald-500 uppercase tracking-[0.3em] sm:tracking-[0.5em] ml-0.5 opacity-90">QUIZ</span>
                 <span className="text-[8px] sm:text-[10px] font-display font-black text-emerald-500 uppercase tracking-[0.3em] sm:tracking-[0.5em] ml-0.5 opacity-90">FOR CODERS</span>
               </motion.div>
             </button>
