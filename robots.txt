@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://quiz-for-coders.vercel.app/sitemap.xml
